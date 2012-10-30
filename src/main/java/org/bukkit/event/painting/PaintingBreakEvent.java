@@ -6,9 +6,7 @@ import org.bukkit.event.HandlerList;
 
 /**
  * Triggered when a painting is removed
- * @deprecated  Use {@link #HangingBreakEvent()} instead.
  */
-@Deprecated
 public class PaintingBreakEvent extends PaintingEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;

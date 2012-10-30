@@ -5,9 +5,7 @@ import org.bukkit.event.Event;
 
 /**
  * Represents a painting-related event.
- * @deprecated  Use {@link #HangingEvent()} instead.
  */
-@Deprecated
 public abstract class PaintingEvent extends Event {
     protected Painting painting;
 
