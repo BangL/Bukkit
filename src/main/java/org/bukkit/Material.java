@@ -1,7 +1,10 @@
 package org.bukkit;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.map.MapView;
@@ -328,7 +331,7 @@ public enum Material {
     ;
 
     private final int id;
-    private final Constructor<? extends MaterialData> ctor;
+    private final Class<? extends MaterialData> data;
     private static Material[] byId = new Material[383];
     private final static Map<String, Material> BY_NAME = Maps.newHashMap();
     private final int maxStack;
@@ -339,11 +342,11 @@ public enum Material {
     }
 
     private Material(final int id, final int stack) {
-        this(id, stack, MaterialData.class);
+        this(id, stack, null);
     }
 
     private Material(final int id, final int stack, final int durability) {
-        this(id, stack, durability, MaterialData.class);
+        this(id, stack, durability, null);
     }
 
     private Material(final int id, final Class<? extends MaterialData> data) {
@@ -358,14 +361,7 @@ public enum Material {
         this.id = id;
         this.durability = (short) durability;
         this.maxStack = stack;
-        // try to cache the constructor for this material
-        try {
-            this.ctor = data.getConstructor(int.class, byte.class);
-        } catch (NoSuchMethodException ex) {
-            throw new AssertionError(ex);
-        } catch (SecurityException ex) {
-            throw new AssertionError(ex);
-        }
+        this.data = data == null ? MaterialData.class : data;
     }
 
     /**
@@ -401,7 +397,7 @@ public enum Material {
      * @return MaterialData associated with this Material
      */
     public Class<? extends MaterialData> getData() {
-        return ctor.getDeclaringClass();
+        return data;
     }
 
     /**
@@ -413,19 +409,24 @@ public enum Material {
      */
     public MaterialData getNewData(final byte raw) {
         try {
+            Constructor<? extends MaterialData> ctor = data.getConstructor(int.class, byte.class);
+
             return ctor.newInstance(id, raw);
         } catch (InstantiationException ex) {
-            final Throwable t = ex.getCause();
-            if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
-            }
-            if (t instanceof Error) {
-                throw (Error) t;
-            }
-            throw new AssertionError(t);
-        } catch (Throwable t) {
-            throw new AssertionError(t);
+            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        return null;
     }
 
     /**

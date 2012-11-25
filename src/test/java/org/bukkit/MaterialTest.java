@@ -1,9 +1,11 @@
 package org.bukkit;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.isA;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
-import org.bukkit.material.MaterialData;
 import org.junit.Test;
 
 public class MaterialTest {
@@ -40,12 +42,14 @@ public class MaterialTest {
         assertThat(Material.getMaterial(null), is(nullValue()));
     }
 
+    // [EB]: gawd we need better code >.>
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void getData() {
         for (Material material : Material.values()) {
-            Class<? extends MaterialData> clazz = material.getData();
+            Class clazz = material.getData();
 
-            assertThat(material.getNewData((byte) 0), is(instanceOf(clazz)));
+            assertThat(material.getNewData((byte) 0), isA(clazz));
         }
     }
 
